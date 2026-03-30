@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sacralisation du Désert - Base de Données</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <style>
+        body { font-family: 'Times New Roman', serif; margin: 40px; background-color: #fcfcfc; }
+        h1 { 
+            background-color: rgba(128, 0, 0, 0.25); 
+            padding: 20px; 
+            text-align: center; 
+            color: #4a0000;
+            border-radius: 5px;
+        }
+        .dataTables_wrapper { margin-top: 30px; }
+        table.dataTable thead th { background-color: #f2f2f2; border-bottom: 2px solid #800000; }
+    </style>
+</head>
+<body>
+
+    <h1>CORPUS : LA SACRALISATION DU DÉSERT</h1>
+
+    <table id="corpusTable" class="display" style="width:100%"></table>
+
+    <script>
+        // Lecture du fichier fusionné
+        Papa.parse("Corpus_Complet.csv", {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                // On définit les colonnes à afficher en priorité
+                const columnsToShow = [
+                    { title: "ID", data: "Nom_master" },
+                    { title: "Site", data: "Site" },
+                    { title: "Chronologie", data: "Chronologie" },
+                    { title: "Divinités", data: "Divinités" },
+                    { title: "Matière", data: "Matière" },
+                    { title: "Dimensions", data: "Dimensions (H, l, ép.)" },
+                    { title: "Technique", data: "Technique" }
+                ];
+
+                $('#corpusTable').DataTable({
+                    data: results.data,
+                    columns: columnsToShow,
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
+                    },
+                    pageLength: 20,
+                    responsive: true
+                });
+            }
+        });
+    </script>
+</body>
+</html>
