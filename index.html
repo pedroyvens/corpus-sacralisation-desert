@@ -3,94 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <title>Corpus Thèse - Sacralisation du Désert</title>
+    
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
+    <script src="https://cdn.datatables.net/plug-ins/1.13.6/sorting/natural.js"></script>
+    
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
     <style>
-        /* Configuration typographique demandée */
+        /* Typographie académique stricte */
         body { 
             font-family: 'Times New Roman', Times, serif; 
             font-size: 11pt; 
             margin: 30px; 
             background-color: #fdfdfd; 
-            color: #1a1a1a;
             line-height: 1.5;
         }
 
         h1 { 
-            background-color: rgba(0, 0, 139, 0.5); /* Bleu foncé 50% transparent */
+            background-color: rgba(0, 0, 139, 0.5); /* Bleu foncé 50% */
             padding: 25px; 
             text-align: center; 
             color: white;
-            border-radius: 4px;
             font-variant: small-caps;
-            font-size: 2em;
-            margin-bottom: 30px;
+            border-radius: 4px;
         }
 
-        /* Ajustement du tableau pour éviter la largeur excessive */
         .container { max-width: 100%; margin: auto; }
-        
-        table.dataTable { 
-            border-bottom: 2px solid darkblue !important; 
-            width: 100% !important;
+        table.dataTable { width: 100% !important; border-bottom: 2px solid darkblue !important; }
+
+        /* Règle limitant la largeur et forçant le texte à aller à la ligne (~10-15 mots par ligne) */
+        table.dataTable tbody td { 
+            white-space: normal !important; 
+            word-wrap: break-word;
+            max-width: 250px; 
+            text-align: justify; 
+            vertical-align: top;
+            padding: 12px 10px;
         }
 
-        /* Titres de colonnes centralisés */
+        /* En-têtes centrés */
         table.dataTable thead th { 
-            background-color: #f0f0f5; 
             text-align: center !important; 
+            background-color: #f2f2f2;
             font-weight: bold;
             border-bottom: 1px solid darkblue;
-            padding: 12px;
         }
 
-        /* Cellules justifiées avec retour à la ligne automatique */
-        table.dataTable tbody td { 
-            text-align: justify; 
-            vertical-align: middle;
-            padding: 12px 10px;
-            white-space: normal !important; /* Force le retour à la ligne */
-            word-wrap: break-word;
-        }
-
-        /* Style de la fiche qui s'ouvre au clic (Détails) */
-        .dtr-details { 
-            width: 100%; 
-            background-color: #f9f9f9; 
-            padding: 20px; 
-        }
-        
-        .dtr-details li { 
-            border-bottom: 1px solid #ddd; 
-            padding: 10px 0;
-            display: flex !important;
-            flex-direction: row;
-        }
-
+        /* Mise en forme des données déployées (Fiche au clic) */
+        .dtr-details { width: 100%; background-color: #f9f9f9; padding: 15px; }
+        .dtr-details li { border-bottom: 1px solid #ddd; padding: 10px 0; display: flex !important; }
         .dtr-title { 
             font-weight: bold; 
             color: darkblue; 
-            min-width: 200px; /* Aligne les titres de la fiche */
+            min-width: 220px; 
             text-transform: uppercase;
             font-size: 0.85em;
         }
-
-        .dtr-data { 
-            text-align: justify; 
-            flex-grow: 1;
-            padding-left: 20px;
-        }
-
-        /* Icône de clic plus discrète */
-        table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before {
-            background-color: darkblue !important;
-        }
+        .dtr-data { text-align: justify; flex-grow: 1; padding-left: 20px; }
     </style>
 </head>
 <body>
@@ -101,20 +75,26 @@
         <table id="corpusTable" class="display responsive nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th>Nom du document</th>
+                    <th>Document</th>
                     <th>Catégorie</th>
                     <th>Site</th>
-                    <th>Dynastie / Roi</th>
+                    <th>Chronologie</th>
+                    <th>Dynastie</th>
+                    <th>Roi</th>
                     <th>Divinités</th>
-                    <th>Sacralisation</th>
                     <th>Épithètes</th>
-                    <th>Lexique "Désert"</th>
-                    <th>Titres de particuliers</th>
                     <th>Iconographie</th>
-                    <th>Type d'écriture</th>
+                    <th>Lexique "Désert"</th>
+                    <th>Locus</th>
+                    <th>Conservation</th>
+                    <th>Dimensions</th>
+                    <th>Matière</th>
                     <th>Répertoire textuel</th>
-                    <th>Bibliographie</th>
+                    <th>Type d'écriture</th>
+                    <th>Technique</th>
+                    <th>Titres de particuliers</th>
                     <th>Commentaire</th>
+                    <th>Bibliographie</th>
                 </tr>
             </thead>
         </table>
@@ -129,43 +109,48 @@
                 $('#corpusTable').DataTable({
                     data: results.data,
                     columns: [
-                        { data: "Nom", defaultContent: "—" },
-                        { data: "Catégorie", defaultContent: "—" },
-                        { data: "Site", defaultContent: "—" },
-                        { 
-                            data: null, 
-                            render: function(data) { 
-                                return (data.Dynastie || "") + " " + (data.Roi || ""); 
-                            }
-                        },
-                        { data: "Divinités", defaultContent: "—" },
-                        { data: "Type de sacralisation", defaultContent: "—" },
-                        { data: "Épithètes", defaultContent: "—" },
-                        { data: "Lexique \"Désert\"", defaultContent: "—" },
-                        { data: "Titres de particuliers", defaultContent: "—" },
-                        { data: "Iconographie", defaultContent: "—" },
-                        { data: "Type d'écriture", defaultContent: "—" },
-                        { data: "Répertoire textuel", defaultContent: "—" },
-                        { data: "Bibliographie", defaultContent: "—" },
-                        { data: "Commentaire", defaultContent: "—" }
+                        /* Données principales visibles - avec type "natural" pour le tri logique des nombres */
+                        { data: "Nom", title: "Document", defaultContent: "—", type: "natural" },
+                        { data: "Catégorie", title: "Catégorie", defaultContent: "—" },
+                        { data: "Site", title: "Site", defaultContent: "—" },
+                        { data: "Chronologie", title: "Chronologie", defaultContent: "—" },
+                        { data: "Dynastie", title: "Dynastie", defaultContent: "—" },
+                        { data: "Roi", title: "Roi", defaultContent: "—" },
+                        { data: "Divinités", title: "Divinités", defaultContent: "—" },
+                        { data: "Épithètes", title: "Épithètes", defaultContent: "—" },
+                        { data: "Iconographie", title: "Iconographie", defaultContent: "—" },
+                        { data: "Lexique \"Désert\"", title: "Lexique \"Désert\"", defaultContent: "—" },
+                        
+                        /* Données cachées par défaut (apparaissent au clic) */
+                        { data: "Locus", title: "Locus", defaultContent: "—" },
+                        { data: "Conservation", title: "Conservation", defaultContent: "—" },
+                        { data: "Dimensions (H, l, ép.)", title: "Dimensions", defaultContent: "—" },
+                        { data: "Matière", title: "Matière", defaultContent: "—" },
+                        { data: "Répertoire textuel", title: "Répertoire textuel", defaultContent: "—" },
+                        { data: "Type d'écriture", title: "Type d'écriture", defaultContent: "—" },
+                        { data: "Technique", title: "Technique", defaultContent: "—" },
+                        { data: "Titres de particuliers", title: "Titres de particuliers", defaultContent: "—" },
+                        { data: "Commentaire", title: "Commentaire", defaultContent: "—" },
+                        { data: "Bibliographie", title: "Bibliographie", defaultContent: "—" }
                     ],
+                    /* Ordre de tri par défaut : 
+                       1. Colonne 2 (Site) en ordre croissant (asc)
+                       2. Colonne 0 (Document) en ordre croissant (asc) via le tri "natural" */
+                    order: [[2, 'asc'], [0, 'asc']],
                     responsive: {
                         details: {
                             type: 'column',
-                            target: 0 // Le clic se fait sur la première colonne (Nom)
+                            target: 0
                         }
                     },
                     columnDefs: [
                         { className: 'dtr-control', targets: 0 },
-                        { responsivePriority: 1, targets: 0 }, // Nom toujours visible
-                        { responsivePriority: 2, targets: 2 }, // Site toujours visible
-                        { targets: [6, 7, 8, 9, 10, 11, 12, 13], visible: false } // Masqués pour réduire la largeur
+                        /* Cible les index 10 à 19 (les 10 dernières colonnes) pour les masquer dans le tableau principal et les forcer dans la fiche détaillée */
+                        { targets: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], className: 'none' }
                     ],
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
-                    },
+                    language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
                     pageLength: 25,
-                    dom: 'frtip'
+                    autoWidth: false
                 });
             }
         });
