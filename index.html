@@ -2,56 +2,140 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Sacralisation du Désert - Base de Données</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <title>Corpus Thèse - Sacralisation du Désert</title>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
     <style>
-        body { font-family: 'Times New Roman', serif; margin: 40px; background-color: #fcfcfc; }
+        body { 
+            font-family: 'Times New Roman', Times, serif; 
+            font-size: 11pt; 
+            margin: 30px; 
+            background-color: #fdfdfd; 
+            color: #222;
+            line-height: 1.4;
+        }
         h1 { 
-            background-color: rgba(128, 0, 0, 0.25); 
+            background-color: rgba(0, 0, 139, 0.5); /* Bleu foncé 50% transparent */
             padding: 20px; 
             text-align: center; 
-            color: #4a0000;
-            border-radius: 5px;
+            color: white;
+            border-radius: 4px;
+            font-variant: small-caps;
+            font-size: 1.8em;
         }
-        .dataTables_wrapper { margin-top: 30px; }
-        table.dataTable thead th { background-color: #f2f2f2; border-bottom: 2px solid #800000; }
+        .container { max-width: 1300px; margin: auto; }
+        
+        /* Style du tableau */
+        table.dataTable { 
+            border-bottom: 2px solid darkblue !important; 
+        }
+        /* Titres de colonnes centralisés */
+        table.dataTable thead th { 
+            background-color: #f0f0f5; 
+            border-bottom: 1px solid darkblue; 
+            text-align: center !important; 
+            font-weight: bold;
+        }
+        /* Contenu des cellules justifié */
+        table.dataTable tbody td { 
+            text-align: justify; 
+            vertical-align: top;
+            padding: 12px 8px;
+        }
+        /* Style des détails (bouton +) */
+        .dtr-details { 
+            background-color: #f4f4f9; 
+            padding: 15px; 
+            border-radius: 5px; 
+            text-align: justify;
+        }
     </style>
 </head>
 <body>
 
-    <h1>CORPUS : LA SACRALISATION DU DÉSERT</h1>
+    <div class="container">
+        <h1>Inventaire Systématique du Corpus</h1>
+        <p style="text-align: center; font-style: italic; margin-bottom: 20px;">
+            Cliquez sur le nom du document pour déployer l'intégralité des données critiques.
+        </p>
 
-    <table id="corpusTable" class="display" style="width:100%"></table>
+        <table id="corpusTable" class="display responsive nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nom du document</th>
+                    <th>Catégorie</th>
+                    <th>Site / Locus</th>
+                    <th>Dynastie / Règne</th>
+                    <th>Divinités & Épithètes</th>
+                    <th>Sacralisation</th>
+                    <th>Lexique "Désert"</th>
+                    <th>Titres</th>
+                    <th>Iconographie</th>
+                    <th>Écriture</th>
+                    <th>Répertoire textuel</th>
+                    <th>Bibliographie</th>
+                    <th>Commentaire</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
 
     <script>
-        // Lecture du fichier fusionné
-        Papa.parse("Corpus_Complet.csv", {
+        Papa.parse("Tableau-Master.csv", {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(results) {
-                // On définit les colonnes à afficher en priorité
-                const columnsToShow = [
-                    { title: "ID", data: "Nom_master" },
-                    { title: "Site", data: "Site" },
-                    { title: "Chronologie", data: "Chronologie" },
-                    { title: "Divinités", data: "Divinités" },
-                    { title: "Matière", data: "Matière" },
-                    { title: "Dimensions", data: "Dimensions (H, l, ép.)" },
-                    { title: "Technique", data: "Technique" }
-                ];
-
                 $('#corpusTable').DataTable({
                     data: results.data,
-                    columns: columnsToShow,
+                    columns: [
+                        { data: "Nom", defaultContent: "" },
+                        { data: "Catégorie", defaultContent: "" },
+                        { data: "Site", defaultContent: "" },
+                        { 
+                            data: null, 
+                            render: function(data) {
+                                return (data.Dynastie || "") + " " + (data.Roi || "");
+                            }
+                        },
+                        { 
+                            data: null, 
+                            render: function(data) {
+                                let div = data.Divinités || "";
+                                let epi = data.Épithètes ? `<br><small><i>${data.Épithètes}</i></small>` : "";
+                                return div + epi;
+                            }
+                        },
+                        { data: "Type de sacralisation", defaultContent: "–" },
+                        { data: "Lexique \"Désert\"", defaultContent: "" },
+                        { data: "Titres de particuliers", defaultContent: "" },
+                        { data: "Iconographie", defaultContent: "" },
+                        { data: "Type d'écriture", defaultContent: "" },
+                        { data: "Répertoire textuel", defaultContent: "" },
+                        { data: "Bibliographie", defaultContent: "" },
+                        { data: "Commentaire", defaultContent: "" }
+                    ],
+                    responsive: {
+                        details: {
+                            type: 'column',
+                            target: 0
+                        }
+                    },
+                    columnDefs: [ {
+                        className: 'control',
+                        orderable: false,
+                        targets: 0
+                    } ],
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
                     },
-                    pageLength: 20,
-                    responsive: true
+                    pageLength: 25
                 });
             }
         });
