@@ -18,62 +18,67 @@
             margin: 30px; 
             background-color: #fdfdfd; 
             color: #222;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         h1 { 
-            background-color: rgba(0, 0, 139, 0.5); /* Bleu foncé 50% transparent */
+            background-color: rgba(0, 0, 139, 0.5); 
             padding: 20px; 
             text-align: center; 
             color: white;
             border-radius: 4px;
             font-variant: small-caps;
-            font-size: 1.8em;
         }
-        .container { max-width: 1300px; margin: auto; }
+        .container { max-width: 100%; margin: auto; }
         
-        /* Style du tableau */
-        table.dataTable { 
-            border-bottom: 2px solid darkblue !important; 
-        }
-        /* Titres de colonnes centralisés */
-        table.dataTable thead th { 
-            background-color: #f0f0f5; 
-            border-bottom: 1px solid darkblue; 
-            text-align: center !important; 
-            font-weight: bold;
-        }
-        /* Contenu des cellules justifié */
-        table.dataTable tbody td { 
-            text-align: justify; 
+        /* Force le retour à la ligne pour réduire la largeur horizontale */
+        table.dataTable td { 
+            white-space: normal !important; 
+            word-wrap: break-word;
             vertical-align: top;
+            text-align: justify;
             padding: 12px 8px;
         }
-        /* Style des détails (bouton +) */
-        .dtr-details { 
-            background-color: #f4f4f9; 
-            padding: 15px; 
-            border-radius: 5px; 
-            text-align: justify;
+        
+        table.dataTable thead th { 
+            background-color: #f0f0f5; 
+            text-align: center !important; 
+            font-weight: bold;
+            border-bottom: 1px solid darkblue;
         }
+
+        /* Style de la fiche déployée (Accordion) */
+        .dtr-details { width: 100%; }
+        .dtr-details li { 
+            border-bottom: 1px solid #e0e0e0; 
+            padding: 8px 0; 
+            display: flex;
+            flex-direction: column;
+        }
+        .dtr-title { 
+            font-weight: bold; 
+            color: darkblue; 
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .dtr-data { padding-left: 10px; text-align: justify; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>Inventaire Systématique du Corpus</h1>
-        <p style="text-align: center; font-style: italic; margin-bottom: 20px;">
-            Cliquez sur le nom du document pour déployer l'intégralité des données critiques.
-        </p>
-
-        <table id="corpusTable" class="display responsive nowrap" style="width:100%">
+        
+        <table id="corpusTable" class="display responsive" style="width:100%">
             <thead>
                 <tr>
                     <th>Nom du document</th>
                     <th>Catégorie</th>
-                    <th>Site / Locus</th>
-                    <th>Dynastie / Règne</th>
-                    <th>Divinités & Épithètes</th>
+                    <th>Site</th>
+                    <th>Dynastie / Roi</th>
+                    <th>Divinités</th>
                     <th>Sacralisation</th>
+                    <th>Épithètes</th>
                     <th>Lexique "Désert"</th>
                     <th>Titres</th>
                     <th>Iconographie</th>
@@ -100,19 +105,11 @@
                         { data: "Site", defaultContent: "" },
                         { 
                             data: null, 
-                            render: function(data) {
-                                return (data.Dynastie || "") + " " + (data.Roi || "");
-                            }
+                            render: function(data) { return (data.Dynastie || "") + " " + (data.Roi || ""); }
                         },
-                        { 
-                            data: null, 
-                            render: function(data) {
-                                let div = data.Divinités || "";
-                                let epi = data.Épithètes ? `<br><small><i>${data.Épithètes}</i></small>` : "";
-                                return div + epi;
-                            }
-                        },
+                        { data: "Divinités", defaultContent: "" },
                         { data: "Type de sacralisation", defaultContent: "–" },
+                        { data: "Épithètes", defaultContent: "" },
                         { data: "Lexique \"Désert\"", defaultContent: "" },
                         { data: "Titres de particuliers", defaultContent: "" },
                         { data: "Iconographie", defaultContent: "" },
@@ -123,18 +120,18 @@
                     ],
                     responsive: {
                         details: {
-                            type: 'column',
-                            target: 0
+                            display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                            type: 'none',
+                            target: ''
                         }
                     },
-                    columnDefs: [ {
-                        className: 'control',
-                        orderable: false,
-                        targets: 0
-                    } ],
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
-                    },
+                    // On définit quelles colonnes sont visibles immédiatement (0 à 5)
+                    columnDefs: [
+                        { responsivePriority: 1, targets: 0 },
+                        { responsivePriority: 2, targets: 2 },
+                        { targets: [6, 7, 8, 9, 10, 11, 12, 13], visible: false } 
+                    ],
+                    language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
                     pageLength: 25
                 });
             }
