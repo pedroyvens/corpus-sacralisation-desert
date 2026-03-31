@@ -109,7 +109,7 @@
                 $('#corpusTable').DataTable({
                     data: results.data,
                     columns: [
-                        /* Données principales visibles - avec type "natural" pour le tri logique des nombres */
+                        /* Données principales visibles */
                         { data: "Nom", title: "Document", defaultContent: "—", type: "natural" },
                         { data: "Catégorie", title: "Catégorie", defaultContent: "—" },
                         { data: "Site", title: "Site", defaultContent: "—" },
@@ -121,17 +121,53 @@
                         { data: "Iconographie", title: "Iconographie", defaultContent: "—" },
                         { data: "Lexique \"Désert\"", title: "Lexique \"Désert\"", defaultContent: "—" },
                         
-                        /* Données cachées par défaut (apparaissent au clic) */
+                        /* Données cachées par défaut (apparaissent au clic) avec recherche souple */
                         { data: "Locus", title: "Locus", defaultContent: "—" },
                         { data: "Conservation", title: "Conservation", defaultContent: "—" },
-                        { data: "Dimensions (H, l, ép.)", title: "Dimensions", defaultContent: "—" },
+                        { 
+                            data: function(row) {
+                                let key = Object.keys(row).find(k => k.toLowerCase().includes("dimension"));
+                                return (key && row[key] && row[key].trim() !== "") ? row[key] : "—";
+                            }, 
+                            title: "Dimensions" 
+                        },
                         { data: "Matière", title: "Matière", defaultContent: "—" },
-                        { data: "Répertoire textuel", title: "Répertoire textuel", defaultContent: "—" },
-                        { data: "Type d'écriture", title: "Type d'écriture", defaultContent: "—" },
+                        { 
+                            data: function(row) {
+                                let key = Object.keys(row).find(k => k.toLowerCase().includes("répertoire"));
+                                return (key && row[key] && row[key].trim() !== "") ? row[key] : "—";
+                            }, 
+                            title: "Répertoire textuel" 
+                        },
+                        { 
+                            data: function(row) {
+                                let key = Object.keys(row).find(k => k.toLowerCase().includes("écriture") || k.toLowerCase().includes("ecriture"));
+                                return (key && row[key] && row[key].trim() !== "") ? row[key] : "—";
+                            }, 
+                            title: "Type d'écriture" 
+                        },
                         { data: "Technique", title: "Technique", defaultContent: "—" },
-                        { data: "Titres de particuliers", title: "Titres de particuliers", defaultContent: "—" },
-                        { data: "Commentaire", title: "Commentaire", defaultContent: "—" },
-                        { data: "Bibliographie", title: "Bibliographie", defaultContent: "—" }
+                        { 
+                            data: function(row) {
+                                let key = Object.keys(row).find(k => k.toLowerCase().includes("titres"));
+                                return (key && row[key] && row[key].trim() !== "") ? row[key] : "—";
+                            }, 
+                            title: "Titres de particuliers" 
+                        },
+                        { 
+                            data: function(row) {
+                                let key = Object.keys(row).find(k => k.toLowerCase().includes("commentaire"));
+                                return (key && row[key] && row[key].trim() !== "") ? row[key] : "—";
+                            }, 
+                            title: "Commentaire" 
+                        },
+                        { 
+                            data: function(row) {
+                                let key = Object.keys(row).find(k => k.toLowerCase().includes("bibliographie"));
+                                return (key && row[key] && row[key].trim() !== "") ? row[key] : "—";
+                            }, 
+                            title: "Bibliographie" 
+                        }
                     ],
                     /* Ordre de tri par défaut : 
                        1. Colonne 2 (Site) en ordre croissant (asc)
